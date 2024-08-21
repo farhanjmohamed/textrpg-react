@@ -3,8 +3,18 @@ import logo from "./assets/logo.png";
 
 function App() {
   const input = useRef(null);
+  const scroll = useRef(null);
+
+  const [textInfo, setTextInfo] = useState([
+    "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Et quae veniam est quo adipisci quia natus tenetur",
+    "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Et quae veniam est quo adipisci quia natus tenetur",
+  ]);
 
   const locations = ["Graveyard", "Ending"];
+
+  useEffect(() => {
+    scroll.current.scrollTop = scroll.current.scrollHeight;
+  }, [textInfo]);
 
   return (
     <div
@@ -33,9 +43,12 @@ function App() {
             </div>
             <hr className="pb-4" />
           </div>
-          <div id="text" className="text-white">
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Et quae veniam est quo adipisci quia natus tenetur
-            necessitatibus, maiores ipsa.
+          <div className="overflow-y-scroll" ref={scroll}>
+            {textInfo.map((x, index) => (
+              <div key={index} id="text" className="text-white">
+                {x}
+              </div>
+            ))}
           </div>
         </div>
 
@@ -62,6 +75,7 @@ function App() {
           ref={input}
           onKeyUp={(e) => {
             if (e.key == "Enter") {
+              setTextInfo((prev) => [...prev, e.target.value]);
               console.log(e.target.value);
             }
           }}
