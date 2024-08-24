@@ -13,6 +13,8 @@ function App() {
   const [stats, setStats] = useState({ health: 10, strength: 10, faith: 0.1 });
   const [power, setPower] = useState(stats.strength * stats.faith);
   const [backpack, setBackpack] = useState([{ coin_purse: 0 }]);
+  const [index, setIndex] = useState(0);
+  const [currentEnemy, setCurrentEnemy] = useState(graveyard[index]);
 
   const graveyard = [
     {
@@ -70,8 +72,34 @@ function App() {
     "As you wander through the wild, you come across a graveyard filled with the bones of long-dead creatures. The sun is setting, casting an eerie orange glow over the bones. You pause for a moment to take in the sight, your heart pounding in your chest. As you make your way through the graveyard, you hear a rustling in the bones. Suddenly, a group of skeletons rises up from the ground, their bones clacking together in a macabre symphony. With a steady hand on your sword, you prepare to defend yourself against the undead creatures. They come at you with surprising speed, their bony fingers reaching out to grab you.",
   ]);
 
+  const currentEnemy = index < graveyard.length ? graveyard[index] : null;
+
+  if (!currentEnemy) {
+    setTextInfo((p) => [...p, "You Win!"]);
+  }
+
   const combat = () => {
-    console.log("attack!");
+    let updatedEnemyHealth = currentEnemy.health - power;
+    let updatedPlayerHealth = stats.health - currentEnemy.dmg;
+
+    if (updatedEnemyHealth <= 0) {
+      setTextInfo((p) => [...p, `${currentEnemy.name} is dead!`]);
+      setStats((p) => ({ ...p, health: p.health + 2, strength: p.strength + 2 }));
+      setBackpack((p) => [
+        ...p,
+        currentEnemy.guaranteed,
+        currentEnemy.loot[Math.floor(Math.random() * currentEnemy.loot.length)],
+      ]);
+      setIndex((i) => i + 1);
+    } else {
+      if (updatedPlayerHealth <= 0) {
+        setTextInfo((p) => [...p, "Oh dear! You died!"]);
+        setTimeout(() => location.reload(), 2000);
+      } else {
+        setStats((p) => ({ ...p, health: updatedPlayerHealth }));
+        setTextInfo((p) => [...p, `You been hit! your health: ${updatedPlayerHealth}`]);
+      }
+    }
   };
 
   const handleSubmit = (e) => {
@@ -79,7 +107,7 @@ function App() {
       const inputVal = input.current.value.trim();
       switch (inputVal.toLowerCase()) {
         case "attack":
-          //do atk
+          combat(currentEnemy);
           setTextInfo((p) => [...p, inputVal]);
           input.current.value = "";
           break;
@@ -105,6 +133,10 @@ function App() {
       }
     }
   };
+
+  useEffect(() => {
+    setPower(stats.strength * stats.faith);
+  }, [stats]);
 
   useEffect(() => {
     scroll.current.scrollTop = scroll.current.scrollHeight;
