@@ -14,8 +14,6 @@ function App() {
   const [power, setPower] = useState(stats.strength * stats.faith);
   const [backpack, setBackpack] = useState([{ coin_purse: 0 }]);
   const [index, setIndex] = useState(0);
-  const [currentEnemy, setCurrentEnemy] = useState(graveyard[index]);
-
   const graveyard = [
     {
       name: "Mini Skeleton",
@@ -66,13 +64,12 @@ function App() {
       guaranteed: "tincture",
     },
   ];
+  const [currentEnemy, setCurrentEnemy] = useState(graveyard[index]);
 
   const [textInfo, setTextInfo] = useState([
     "You stand at the castle gates, ready to explore the unknown world outside. Excitement and apprehension mix inside you as you step into the wild. Your determination to prove yourself as a worthy adventurer and protector of the realm drives you forward. With your sword at your side and a heart full of determination, you step into the unknown, eager to discover what the world has in store for you.",
     "As you wander through the wild, you come across a graveyard filled with the bones of long-dead creatures. The sun is setting, casting an eerie orange glow over the bones. You pause for a moment to take in the sight, your heart pounding in your chest. As you make your way through the graveyard, you hear a rustling in the bones. Suddenly, a group of skeletons rises up from the ground, their bones clacking together in a macabre symphony. With a steady hand on your sword, you prepare to defend yourself against the undead creatures. They come at you with surprising speed, their bony fingers reaching out to grab you.",
   ]);
-
-  const currentEnemy = index < graveyard.length ? graveyard[index] : null;
 
   if (!currentEnemy) {
     setTextInfo((p) => [...p, "You Win!"]);
@@ -91,13 +88,18 @@ function App() {
         currentEnemy.loot[Math.floor(Math.random() * currentEnemy.loot.length)],
       ]);
       setIndex((i) => i + 1);
+      setCurrentEnemy(graveyard[index]);
     } else {
       if (updatedPlayerHealth <= 0) {
         setTextInfo((p) => [...p, "Oh dear! You died!"]);
         setTimeout(() => location.reload(), 2000);
       } else {
         setStats((p) => ({ ...p, health: updatedPlayerHealth }));
-        setTextInfo((p) => [...p, `You been hit! your health: ${updatedPlayerHealth}`]);
+        setCurrentEnemy((p) => ({ ...p, health: updatedEnemyHealth }));
+        setTextInfo((p) => [
+          ...p,
+          `You been hit! your health: ${updatedPlayerHealth}. Your enemy: ${updatedEnemyHealth}`,
+        ]);
       }
     }
   };
@@ -106,28 +108,31 @@ function App() {
     if (e.key === "Enter") {
       const inputVal = input.current.value.trim();
       switch (inputVal.toLowerCase()) {
-        case "attack":
+        case "a": //attack
           combat(currentEnemy);
           setTextInfo((p) => [...p, inputVal]);
           input.current.value = "";
           break;
-        case "rest":
-          // do rest
-          setTextInfo((p) => [...p, inputVal]);
+        case "r": // rest
+          setStats((p) => ({ ...p, health: p.health + 2 }));
+          setTextInfo((p) => [...p, inputVal, "You take a quick breather! +2 health"]);
           input.current.value = "";
           break;
-        case "tincture":
+        case "t": //tincture
           //tincture mechanic
           setTextInfo((p) => [...p, inputVal]);
           input.current.value = "";
           break;
-        case "flee":
+        case "f": //flee
           // flee mechanic
           setTextInfo((p) => [...p, inputVal]);
           input.current.value = "";
           break;
+        case "q":
+          setTextInfo((p) => [...p, "Goodbye!"]);
+          setTimeout(() => location.reload(), 1500);
+          break;
         default:
-          //Invalid Action
           setTextInfo((p) => [...p, "Invalid Action"]);
           input.current.value = "";
       }
@@ -137,6 +142,18 @@ function App() {
   useEffect(() => {
     setPower(stats.strength * stats.faith);
   }, [stats]);
+
+  useEffect(() => {
+    if (index < graveyard.length) {
+      setCurrentEnemy(graveyard[index]);
+    } else {
+      setTextInfo((p) => [...p, "You Win!"]);
+    }
+  }, [index]);
+
+  useEffect(() => {
+    setCurrentEnemy(graveyard[0]);
+  }, []);
 
   useEffect(() => {
     scroll.current.scrollTop = scroll.current.scrollHeight;
@@ -173,19 +190,22 @@ function App() {
         <div className="flex flex-row justify-center mx-auto w-1/2">
           <div className=" flex flex-col justify-between mx-auto w-full h-[40rem] bg-zinc-900 p-3" id="screen">
             <div id="imgs grow-0">
-              <p className="text-center text-white">monster title</p>
-              <p className="border-white border mb-4 w-40 h-40 mt-4 mx-auto"></p>
+              <p className="text-center text-white">{currentEnemy.name}</p>
+              <p className="border-white border mb-4 w-40 h-40 mt-4 mx-auto">
+                <img src={currentEnemy.image} alt="" />
+              </p>
               <div id="monster-info" className="justify-center flex flex-row gap-3">
                 <p className="text-green-600">monster info</p>
-                <p className="text-red-600">monster info</p>
+                <p className="text-red-600">Health: {currentEnemy.health}</p>
                 <p className="text-blue-600">monster info</p>
               </div>
               <hr className="pb-4" />
             </div>
             <div className="overflow-y-scroll" ref={scroll}>
               {textInfo.map((x, index) => (
-                <div key={index} id="text" className="text-white pb-2">
+                <div key={index} id="text" className="text-white pb-2 pt-2">
                   {x}
+                  <p className="w-1/2 mx-auto border-b-2 border-white pt-2 pb-2" />
                 </div>
               ))}
             </div>
