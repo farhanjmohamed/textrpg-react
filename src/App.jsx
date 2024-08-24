@@ -234,7 +234,13 @@ function App() {
           </div>
         </div>
         <div className="flex justify-center">
-          <input placeholder="Enter Command: " type="text" className="w-1/2 p-2" ref={input} onKeyUp={handleSubmit} />
+          <input
+            placeholder="(A)ttack, (R)est, (T)incture, (F)lee, (Q)uit "
+            type="text"
+            className="w-1/2 p-2"
+            ref={input}
+            onKeyUp={handleSubmit}
+          />
         </div>
       </div>
     </div>
