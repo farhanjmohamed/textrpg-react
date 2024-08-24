@@ -4,6 +4,14 @@ import brute from "./assets/enemy/Brute.png";
 import mage from "./assets/enemy/Mage.png";
 import mini from "./assets/enemy/Mini.png";
 import reg from "./assets/enemy/Regular.png";
+import char from "./assets/char.png";
+import sword from "./assets/items/sword.png";
+import dust from "./assets/items/dust.png";
+import staff from "./assets/items/staff.png";
+import necklace from "./assets/items/necklace.png";
+import gold from "./assets/items/gold.png";
+import trans from "./assets/items/trans.png";
+import bones from "./assets/items/bones.png";
 
 function App() {
   const input = useRef(null);
@@ -12,8 +20,20 @@ function App() {
   const [name, setName] = useState("");
   const [stats, setStats] = useState({ health: 10, strength: 10, faith: 0.1 });
   const [power, setPower] = useState(stats.strength * stats.faith);
-  const [backpack, setBackpack] = useState([{ coin_purse: 0 }]);
+  const [backpack, setBackpack] = useState(["Coins"]);
   const [index, setIndex] = useState(0);
+  const [game, setGame] = useState(true);
+  const [coinPurse, setCoinPurse] = useState(0);
+
+  const items = [
+    { name: "Coins", image: gold },
+    { name: "Bone Sword", image: sword },
+    { name: "Bone Necklace", image: necklace },
+    { name: "Bone Dust", image: dust },
+    { name: "Nothing", image: trans },
+    { name: "Bones", image: bones },
+    { name: "Bone Staff", image: staff },
+  ];
   const graveyard = [
     {
       name: "Mini Skeleton",
@@ -61,7 +81,7 @@ function App() {
       image: mage,
       dmg: Math.floor(Math.random() * 3),
       loot: ["Coins", "Bone Sword", "Bone Necklace", "Bone Dust", "Nothing"],
-      guaranteed: "tincture",
+      guaranteed: "Bone Staff",
     },
   ];
   const [currentEnemy, setCurrentEnemy] = useState(graveyard[index]);
@@ -73,20 +93,25 @@ function App() {
 
   if (!currentEnemy) {
     setTextInfo((p) => [...p, "You Win!"]);
+    setGame(false);
   }
 
   const combat = () => {
-    let updatedEnemyHealth = currentEnemy.health - power;
-    let updatedPlayerHealth = stats.health - currentEnemy.dmg;
+    let updatedEnemyHealth = Math.floor(currentEnemy.health - power);
+    let updatedPlayerHealth = Math.floor(stats.health - currentEnemy.dmg);
 
     if (updatedEnemyHealth <= 0) {
       setTextInfo((p) => [...p, `${currentEnemy.name} is dead!`]);
-      setStats((p) => ({ ...p, health: p.health + 2, strength: p.strength + 2 }));
-      setBackpack((p) => [
-        ...p,
-        currentEnemy.guaranteed,
-        currentEnemy.loot[Math.floor(Math.random() * currentEnemy.loot.length)],
-      ]);
+      setStats((p) => ({ ...p, health: p.health + 2, strength: p.strength + 2, faith: p.faith + 0.2 }));
+
+      const randomLoot = currentEnemy.loot[Math.floor(Math.random() * currentEnemy.loot.length)];
+
+      if (randomLoot === "Coins") {
+        setCoinPurse((p) => p + 2);
+      } else {
+        setBackpack((p) => [...p, randomLoot]);
+      }
+      setBackpack((p) => [...p, currentEnemy.guaranteed]);
       setIndex((i) => i + 1);
       setCurrentEnemy(graveyard[index]);
     } else {
@@ -96,10 +121,7 @@ function App() {
       } else {
         setStats((p) => ({ ...p, health: updatedPlayerHealth }));
         setCurrentEnemy((p) => ({ ...p, health: updatedEnemyHealth }));
-        setTextInfo((p) => [
-          ...p,
-          `You been hit! your health: ${updatedPlayerHealth}. Your enemy: ${updatedEnemyHealth}`,
-        ]);
+        setTextInfo((p) => [...p, `You take a mighty swing!`]);
       }
     }
   };
@@ -122,11 +144,6 @@ function App() {
         case "r": // rest
           setStats((p) => ({ ...p, health: p.health + 2 }));
           setTextInfo((p) => [...p, inputVal, "You take a quick breather! +2 health"]);
-          input.current.value = "";
-          break;
-        case "t": //tincture
-          //tincture mechanic
-          setTextInfo((p) => [...p, inputVal]);
           input.current.value = "";
           break;
         case "f": //flee
@@ -182,7 +199,12 @@ function App() {
       </div>
       <div className="flex justify-center text-center pb-2">
         {name === "" ? (
-          <input placeholder="Enter Name" type="text" onKeyUp={handleNameChange} />
+          <input
+            className="text-sm text-center"
+            placeholder="Adventurer Name?"
+            type="text"
+            onKeyUp={handleNameChange}
+          />
         ) : (
           <button onClick={() => setName("")} className="bg-gray-500 w-32 rounded-md text-white">
             Change Name
@@ -193,18 +215,23 @@ function App() {
       <div>
         <div className="flex flex-row justify-center mx-auto w-1/2">
           <div className=" flex flex-col justify-between mx-auto w-full h-[40rem] bg-zinc-900 p-3" id="screen">
-            <div id="imgs grow-0">
-              <p className="text-center text-white">{currentEnemy.name}</p>
-              <p className="border-white border mb-4 w-40 h-40 mt-4 mx-auto">
-                <img src={currentEnemy.image} alt="" />
-              </p>
-              <div id="monster-info" className="justify-center flex flex-row gap-3">
-                <p className="text-green-600">monster info</p>
-                <p className="text-red-600">Health: {currentEnemy.health}</p>
-                <p className="text-blue-600">monster info</p>
+            {game ? (
+              <div id="imgs grow-0">
+                <p className="text-center text-white">{currentEnemy.name}</p>
+                <p className="border-white border mb-4 w-40 h-40 mt-4 mx-auto">
+                  <img src={currentEnemy.image} alt="" />
+                </p>
+                <div id="monster-info" className="justify-center flex flex-row gap-3">
+                  <p className="text-green-600">Health: {currentEnemy.health}</p>
+                  <p className="text-red-600">Dmg: {currentEnemy.dmg}</p>
+                  <p className="text-blue-600">monster info</p>
+                </div>
+                <hr className="pb-4" />
               </div>
-              <hr className="pb-4" />
-            </div>
+            ) : (
+              <p className="text-5xl text-white text-center pt-8 ">You Win!</p>
+            )}
+
             <div className="overflow-y-scroll" ref={scroll}>
               {textInfo.map((x, index) => (
                 <div key={index} id="text" className="text-white pb-2 pt-2">
@@ -216,15 +243,33 @@ function App() {
           </div>
 
           <div className="h-[40rem] w-[15rem] bg-[#5B3E31]" id="backpack">
-            <div className="p-4 grid grid-cols-2 gap-2">
-              <div className="w-16 h-16 bg-white hover:cursor-pointer"></div>
-              <div className="w-16 h-16 bg-white hover:cursor-pointer"></div>
-              <div className="w-16 h-16 bg-white hover:cursor-pointer"></div>
-              <div className="w-16 h-16 bg-white hover:cursor-pointer"></div>
-              <div className="w-16 h-16 bg-white hover:cursor-pointer"></div>
-              <div className="w-16 h-16 bg-white hover:cursor-pointer"></div>
-              <div className="w-16 h-16 bg-white hover:cursor-pointer"></div>
-              <div className="w-16 h-16 bg-white hover:cursor-pointer"></div>
+            <div className="p-4 grid grid-cols-2 gap-2 h-[19rem] overflow-y-scroll">
+              {backpack.map((x, index) => {
+                if (x === "Coins") {
+                  return (
+                    <p key={index} className="text-white">
+                      Coins: {coinPurse}
+                    </p>
+                  );
+                } else {
+                  const item = items.find((item) => item.name === x);
+                  if (item) {
+                    return (
+                      <div
+                        key={index}
+                        className="hover:cursor-pointer"
+                        onClick={() => {
+                          if (item.name === "Bones") {
+                          }
+                        }}
+                      >
+                        <img src={item.image} alt={item.name} />
+                      </div>
+                    );
+                  }
+                }
+                return null;
+              })}
             </div>
             <hr className="w-3/4 mx-auto" />
             <p className="text-center text-white">Character Info</p>
@@ -234,6 +279,9 @@ function App() {
               <p>Strength: {stats.strength}</p>
               <p>Faith: {stats.faith}</p>
               <p>Current Power: {power}</p>
+            </div>
+            <div className="mt-4 w-40 h-40 mx-auto">
+              <img src={char} alt="" />
             </div>
           </div>
         </div>
