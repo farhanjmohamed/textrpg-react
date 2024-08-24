@@ -104,6 +104,12 @@ function App() {
     }
   };
 
+  const handleNameChange = (e) => {
+    if (e.key === "Enter") {
+      setName(e.target.value);
+    }
+  };
+
   const handleSubmit = (e) => {
     if (e.key === "Enter") {
       const inputVal = input.current.value.trim();
@@ -174,18 +180,16 @@ function App() {
           }}
         />
       </div>
-      <div className="flex justify-center text-center">
-        <input placeholder="Enter Name" type="text" onChange={(e) => setName(e.target.value)} />
+      <div className="flex justify-center text-center pb-2">
+        {name === "" ? (
+          <input placeholder="Enter Name" type="text" onKeyUp={handleNameChange} />
+        ) : (
+          <button onClick={() => setName("")} className="bg-gray-500 w-32 rounded-md text-white">
+            Change Name
+          </button>
+        )}
       </div>
-      {name.length > 0 ? (
-        <>
-          <p className="text-center text-5xl font-black text-white">hello {name}</p>
-        </>
-      ) : (
-        <>
-          <p className="text-center text-xl text-white">no name</p>
-        </>
-      )}
+
       <div>
         <div className="flex flex-row justify-center mx-auto w-1/2">
           <div className=" flex flex-col justify-between mx-auto w-full h-[40rem] bg-zinc-900 p-3" id="screen">
