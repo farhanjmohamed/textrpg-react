@@ -103,6 +103,8 @@ function App() {
 
       if (randomLoot === "Coins") {
         setCoinPurse((p) => p + 2);
+      } else if (randomLoot === "Nothing") {
+        return;
       } else {
         setBackpack((p) => [...p, randomLoot]);
       }
@@ -286,15 +288,39 @@ function App() {
                           } else if (item.name === "Bone Dust") {
                             let numOfDust = 0;
                             for (let z = 0; z < backpack.length; z++) {
-                              if (backpack[z] === "Bones") {
+                              if (backpack[z] === "Bone Dust") {
                                 numOfDust++;
                               }
                             }
                             setCoinPurse((p) => p + 0.5 * numOfDust);
                             setBackpack((p) => p.filter((i) => i !== "Bone Dust"));
                           } else if (item.name === "Bone Necklace") {
-                            setCoinPurse((p) => p + 2);
+                            let numOfNeck = 0;
+                            for (let z = 0; z < backpack.length; z++) {
+                              if (backpack[z] === "Bone Necklace") {
+                                numOfNeck++;
+                              }
+                            }
+                            setCoinPurse((p) => p + 2 * numOfNeck);
                             setBackpack((p) => p.filter((i) => i !== "Bone Necklace"));
+                          } else if (item.name === "Bone Sword") {
+                            let numOfSword = 0;
+                            for (let z = 0; z < backpack.length; z++) {
+                              if (backpack[z] === "Bone Sword") {
+                                numOfSword++;
+                              }
+                            }
+                            setCoinPurse((p) => p + 4 * numOfSword);
+                            setBackpack((p) => p.filter((i) => i !== "Bone Sword"));
+                          } else if (item.name === "Bone Staff") {
+                            let numOfStaff = 0;
+                            for (let z = 0; z < backpack.length; z++) {
+                              if (backpack[z] === "Bone Staff") {
+                                numOfStaff++;
+                              }
+                            }
+                            setCoinPurse((p) => p + 10 * numOfStaff);
+                            setBackpack((p) => p.filter((i) => i !== "Bone Staff"));
                           }
                         }}
                       >
@@ -308,14 +334,14 @@ function App() {
             </div>
             <hr className="w-3/4 mx-auto" />
             <p className="text-center text-white">Character Info</p>
-            <div className="pl-2 pb-1 text-white">
+            <div className="pt-1 pb-1 text-white text-center">
               <p>{name}</p>
               <p>Health: {stats.health}</p>
               <p>Strength: {stats.strength}</p>
-              <p>Faith: {stats.faith}</p>
-              <p>Current Power: {power}</p>
+              <p>Faith: {stats.faith.toFixed(2)}</p>
+              <p>Current Power: {power.toFixed(2)}</p>
             </div>
-            <div className="mt-4 w-40 h-40 mx-auto">
+            <div className="mt-4 w-28 h-28 mx-auto">
               <img src={char} alt="" />
             </div>
             <div className="pt-2 flex justify-center">
