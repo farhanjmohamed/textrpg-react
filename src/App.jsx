@@ -97,7 +97,7 @@ function App() {
 
     if (updatedEnemyHealth <= 0) {
       setTextInfo((p) => [...p, `${currentEnemy.name} is dead!`]);
-      setStats((p) => ({ ...p, health: p.health + 2, strength: p.strength + 2, faith: p.faith + 0.2 }));
+      setStats((p) => ({ ...p, health: p.health + 2, strength: p.strength + 2 }));
 
       const randomLoot = currentEnemy.loot[Math.floor(Math.random() * currentEnemy.loot.length)];
 
@@ -146,7 +146,6 @@ function App() {
           input.current.value = "";
           break;
         case "f": //flee
-          // flee mechanic
           setIndex(0);
           input.current.value = "";
           break;
@@ -253,9 +252,10 @@ function App() {
               {backpack.map((x, index) => {
                 if (x === "Coins") {
                   return (
-                    <p key={index} className="text-white">
-                      Coins: {coinPurse}
-                    </p>
+                    <div key={index} className="text-white flex flex-row w-12 h-12">
+                      <img src={gold} alt="" />
+                      {coinPurse}
+                    </div>
                   );
                 } else {
                   const item = items.find((item) => item.name === x);
@@ -266,17 +266,35 @@ function App() {
                         className="hover:cursor-pointer"
                         onClick={() => {
                           if (item.name === "Bones") {
-                            let numOfBone = 0;
+                            setStats((p) => {
+                              let numOfBone = 0;
+                              for (let z = 0; z < backpack.length; z++) {
+                                if (backpack[z] === "Bones") {
+                                  numOfBone++;
+                                }
+                              }
+
+                              let maxFaithIncrease = 1;
+                              let faithIncrease = Math.min(numOfBone * 0.2, maxFaithIncrease);
+
+                              return {
+                                ...p,
+                                faith: p.faith + faithIncrease,
+                              };
+                            });
+                            setBackpack((p) => p.filter((i) => i !== "Bones"));
+                          } else if (item.name === "Bone Dust") {
+                            let numOfDust = 0;
                             for (let z = 0; z < backpack.length; z++) {
                               if (backpack[z] === "Bones") {
-                                numOfBone++;
+                                numOfDust++;
                               }
                             }
-                            setStats((p) => ({
-                              ...p,
-                              faith: p.faith * numOfBone * 0.9, // fix this math.
-                            }));
-                            setBackpack((p) => p.filter((i) => i !== "Bones"));
+                            setCoinPurse((p) => p + 0.5 * numOfDust);
+                            setBackpack((p) => p.filter((i) => i !== "Bone Dust"));
+                          } else if (item.name === "Bone Necklace") {
+                            setCoinPurse((p) => p + 2);
+                            setBackpack((p) => p.filter((i) => i !== "Bone Necklace"));
                           }
                         }}
                       >
@@ -299,6 +317,24 @@ function App() {
             </div>
             <div className="mt-4 w-40 h-40 mx-auto">
               <img src={char} alt="" />
+            </div>
+            <div className="pt-2 flex justify-center">
+              <button
+                className="bg-red-600 text-yellow-300 text-center rounded w-32"
+                onClick={() => {
+                  if (coinPurse >= 5) {
+                    setStats((p) => ({
+                      ...p,
+                      health: p.health + 10,
+                    }));
+                    setCoinPurse((p) => p - 5);
+                  } else {
+                    return;
+                  }
+                }}
+              >
+                buy potion: 5c
+              </button>
             </div>
           </div>
         </div>
