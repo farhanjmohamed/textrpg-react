@@ -39,7 +39,7 @@ function App() {
       name: "Mini Skeleton",
       health: 5,
       image: mini,
-      dmg: Math.floor(Math.random() * 2),
+      dmg: 1,
       loot: ["Coins", "Bone Sword", "Bone Necklace", "Bone Dust", "Nothing"],
       guaranteed: "Bones",
     },
@@ -47,7 +47,7 @@ function App() {
       name: "Skeleton",
       health: 7,
       image: reg,
-      dmg: Math.floor(Math.random() * 3),
+      dmg: 2,
       loot: ["Coins", "Bone Sword", "Bone Necklace", "Bone Dust", "Nothing"],
       guaranteed: "Bones",
     },
@@ -55,7 +55,7 @@ function App() {
       name: "Skeleton",
       health: 7,
       image: reg,
-      dmg: Math.floor(Math.random() * 3),
+      dmg: 3,
       loot: ["Coins", "Bone Sword", "Bone Necklace", "Bone Dust", "Nothing"],
       guaranteed: "Bones",
     },
@@ -63,7 +63,7 @@ function App() {
       name: "Skeleton Brute",
       health: 10,
       image: brute,
-      dmg: Math.floor(Math.random() * 3),
+      dmg: 5,
       loot: ["Coins", "Bone Sword", "Bone Necklace", "Bone Dust", "Nothing"],
       guaranteed: "Bones",
     },
@@ -71,7 +71,7 @@ function App() {
       name: "Skeleton Brute",
       health: 10,
       image: brute,
-      dmg: Math.floor(Math.random() * 3),
+      dmg: 7,
       loot: ["Coins", "Bone Sword", "Bone Necklace", "Bone Dust", "Nothing"],
       guaranteed: "Bones",
     },
@@ -79,7 +79,7 @@ function App() {
       name: "Skeletal Mage",
       health: 20,
       image: mage,
-      dmg: Math.floor(Math.random() * 3),
+      dmg: 9,
       loot: ["Coins", "Bone Sword", "Bone Necklace", "Bone Dust", "Nothing"],
       guaranteed: "Bone Staff",
     },
@@ -93,7 +93,7 @@ function App() {
 
   if (!currentEnemy) {
     setTextInfo((p) => [...p, "You Win!"]);
-    setGame(false);
+    setTimeout(() => location.reload(), 2000);
   }
 
   const combat = () => {
@@ -113,7 +113,11 @@ function App() {
       }
       setBackpack((p) => [...p, currentEnemy.guaranteed]);
       setIndex((i) => i + 1);
-      setCurrentEnemy(graveyard[index]);
+      if (index + 1 < graveyard.length) {
+        setCurrentEnemy(graveyard[index + 1]);
+      } else {
+        setGame(false);
+      }
     } else {
       if (updatedPlayerHealth <= 0) {
         setTextInfo((p) => [...p, "Oh dear! You died!"]);
@@ -138,7 +142,7 @@ function App() {
       switch (inputVal.toLowerCase()) {
         case "a": //attack
           combat(currentEnemy);
-          setTextInfo((p) => [...p, inputVal]);
+          setTextInfo((p) => [...p, `${currentEnemy.name} back swings at you!`]);
           input.current.value = "";
           break;
         case "r": // rest
@@ -148,7 +152,7 @@ function App() {
           break;
         case "f": //flee
           // flee mechanic
-          setTextInfo((p) => [...p, inputVal]);
+          setIndex(0);
           input.current.value = "";
           break;
         case "q":
@@ -260,8 +264,17 @@ function App() {
                         className="hover:cursor-pointer"
                         onClick={() => {
                           if (item.name === "Bones") {
-                            console.log("bury");
-                            setBackpack((p) => p.filter((i) => i !== i.name));
+                            let numOfBone = 0;
+                            for (let z = 0; z < backpack.length; z++) {
+                              if (backpack[z] === "Bones") {
+                                numOfBone++;
+                              }
+                            }
+                            setStats((p) => ({
+                              ...p,
+                              faith: p.faith * numOfBone,
+                            }));
+                            setBackpack((p) => p.filter((i) => i !== "Bones"));
                           }
                         }}
                       >
