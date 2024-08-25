@@ -224,7 +224,7 @@ function App() {
                 <div id="monster-info" className="justify-center flex flex-row gap-3">
                   <p className="text-green-600">Health: {currentEnemy.health}</p>
                   <p className="text-red-600">Dmg: {currentEnemy.dmg}</p>
-                  <p className="text-blue-600">monster info</p>
+                  <p className="text-blue-600">Guaranteed Loot: {currentEnemy.guaranteed}</p>
                 </div>
                 <hr className="pb-4" />
               </div>
@@ -260,6 +260,8 @@ function App() {
                         className="hover:cursor-pointer"
                         onClick={() => {
                           if (item.name === "Bones") {
+                            console.log("bury");
+                            setBackpack((p) => p.filter((i) => i !== i.name));
                           }
                         }}
                       >
@@ -287,7 +289,7 @@ function App() {
         </div>
         <div className="flex justify-center">
           <input
-            placeholder="(A)ttack, (R)est, (T)incture, (F)lee, (Q)uit "
+            placeholder="(A)ttack, (R)est, (F)lee, (Q)uit "
             type="text"
             className="w-1/2 p-2"
             ref={input}
