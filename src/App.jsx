@@ -12,6 +12,7 @@ import necklace from "./assets/items/necklace.png";
 import gold from "./assets/items/gold.png";
 import trans from "./assets/items/trans.png";
 import bones from "./assets/items/bones.png";
+import bg from "./assets/bg.png";
 
 function App() {
   const input = useRef(null);
@@ -192,7 +193,7 @@ function App() {
   return (
     <div
       className="w-screen min-h-screen h-auto bg-zinc-800 bg-center bg-no-repeat bg-cover"
-      style={{ backgroundImage: "url(./src/assets/bg.png)" }}
+      style={{ backgroundImage: `url(${bg})` }}
     >
       <div className="flex justify-center pt-10 pb-10 h-60 w-auto">
         <img
