@@ -91,11 +91,6 @@ function App() {
     "As you wander through the wild, you come across a graveyard filled with the bones of long-dead creatures. The sun is setting, casting an eerie orange glow over the bones. You pause for a moment to take in the sight, your heart pounding in your chest. As you make your way through the graveyard, you hear a rustling in the bones. Suddenly, a group of skeletons rises up from the ground, their bones clacking together in a macabre symphony. With a steady hand on your sword, you prepare to defend yourself against the undead creatures. They come at you with surprising speed, their bony fingers reaching out to grab you.",
   ]);
 
-  if (!currentEnemy) {
-    setTextInfo((p) => [...p, "You Win!"]);
-    setTimeout(() => location.reload(), 2000);
-  }
-
   const combat = () => {
     let updatedEnemyHealth = Math.floor(currentEnemy.health - power);
     let updatedPlayerHealth = Math.floor(stats.health - currentEnemy.dmg);
@@ -112,8 +107,8 @@ function App() {
         setBackpack((p) => [...p, randomLoot]);
       }
       setBackpack((p) => [...p, currentEnemy.guaranteed]);
-      setIndex((i) => i + 1);
       if (index + 1 < graveyard.length) {
+        setIndex((i) => i + 1);
         setCurrentEnemy(graveyard[index + 1]);
       } else {
         setGame(false);
@@ -165,6 +160,13 @@ function App() {
       }
     }
   };
+
+  useEffect(() => {
+    if (game === false) {
+      setTextInfo((p) => [...p, "You Win!"]);
+      setTimeout(() => location.reload(), 2000);
+    }
+  }, [game]);
 
   useEffect(() => {
     setPower(stats.strength * stats.faith);
@@ -272,7 +274,7 @@ function App() {
                             }
                             setStats((p) => ({
                               ...p,
-                              faith: p.faith * numOfBone,
+                              faith: p.faith * numOfBone * 0.9, // fix this math.
                             }));
                             setBackpack((p) => p.filter((i) => i !== "Bones"));
                           }
